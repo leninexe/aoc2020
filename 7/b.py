@@ -1,20 +1,32 @@
+def sumContainedBags(rules, color, amount):
+	amountOfBags = amount
+
+	for v in rules[color]:
+		amountOfBags += sumContainedBags(rules, v, amount * rules[color][v])
+
+	return amountOfBags
+
 # Read Input
 f = open("input.txt", "r")
 
-seatIds = []
+bagLogic = {}
 
-for l in f:
-	specification = l.strip()
+for line in f:
+	parts = line.strip().split("contain")
+	outer = parts[0].replace("bags", "").strip()
+	innerParts = parts[1].strip().split(",")
 
-	row = int(l[0:7].replace("F", "0").replace("B", "1"), 2)
-	column = int(l[7:].replace("L", "0").replace("R", "1"), 2)
-	seatId = row * 8 + column
+	contents = {}
 
-	seatIds.append(seatId)
+	for i in range(len(innerParts)):
+		inner = innerParts[i].strip().replace("bags", "").replace("bag", "").replace(".", "").strip()
 
-seatIds.sort()
+		if inner != "no other":
+			amount = inner.split(" ", 1)[0]
+			color = inner.split(" ", 1)[1]
 
-for i in range(len(seatIds)):
-	if i > 1:
-		if seatIds[i - 1] == seatIds[i] - 2:
-			print(seatIds[i - 1] + 1)
+			contents[color] = int(amount)
+
+	bagLogic[outer] = contents
+
+print(sumContainedBags(bagLogic, "shiny gold", 1) - 1)

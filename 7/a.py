@@ -1,15 +1,43 @@
 # Read Input
 f = open("input.txt", "r")
 
-maxSeatId = 0
+bagLogic = {}
 
-for l in f:
-	specification = l.strip()
+for line in f:
+	parts = line.strip().split("contain")
+	outer = parts[0].replace("bags", "").strip()
+	innerParts = parts[1].strip().split(",")
 
-	row = int(l[0:7].replace("F", "0").replace("B", "1"), 2)
-	column = int(l[7:].replace("L", "0").replace("R", "1"), 2)
-	seatId = row * 8 + column
+	contents = {}
 
-	if seatId > maxSeatId: maxSeatId = seatId
+	for i in range(len(innerParts)):
+		inner = innerParts[i].strip().replace("bags", "").replace("bag", "").replace(".", "").strip()
 
-print(maxSeatId)
+		if inner != "no other":
+			amount = inner.split(" ", 1)[0]
+			color = inner.split(" ", 1)[1]
+
+			contents[color] = int(amount)
+
+	bagLogic[outer] = contents
+
+candidates = set(())
+candidates.add("shiny gold")
+
+currentSize = len(candidates)
+oldSize = 0
+
+while len(candidates) != oldSize:
+	oldSize = len(candidates)
+
+	for bl in bagLogic:
+		newCandidates = set(())
+
+		for c in candidates:
+			if list(bagLogic[bl].keys()).count(c) > 0:
+				newCandidates.add(bl)
+
+		candidates.update(newCandidates)
+
+candidates.remove("shiny gold")
+print(len(candidates))
